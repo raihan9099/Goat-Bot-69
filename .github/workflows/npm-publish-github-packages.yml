@@ -1,0 +1,29 @@
+name: Deploy GoatBot V2
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create account file from secret
+        run: echo "${{ secrets.ACCOUNT_DEV_TXT }}" > account.dev.txt
+
+      - name: Run bot
+        run: npm run start
+        env:
+          NODE_ENV: production
