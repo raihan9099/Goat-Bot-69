@@ -1,116 +1,146 @@
-const fs = require("fs-extra");
-const { utils } = global;
+const { getPrefix } = global.utils;
+const { commands, aliases } = global.GoatBot;
+const fontBaseUrl = "https://raw.githubusercontent.com/Saim12678/Saim69/1a8068d7d28396dbecff28f422cb8bc9bf62d85f/font";
+
+const categoryEmojis = {
+  "📛": "☣️ |",
+  "ADMIN": "🛡️ |",
+  "AI": "🤖 |",
+  "AI-IMAGE": "🖼️ |",
+  "ANIME": "😺 |",
+  "AUTOMATION": "⚙️ |",
+  "BOX CHAT": "🗃️ |",
+  "CHAT": "💬 |",
+  "CONFIG": "⚙️ |",
+  "CONTACTS ADMIN": "📞 |",
+  "CONVERT": "🔄 |",
+  "CUSTOM": "✨ |",
+  "DONT KNOW": "❓ |",
+  "ECONOMY": "💰 |",
+  "FIGHT": "🥊 |",
+  "FUN": "😜 |",
+  "GAME": "🎮 |",
+  "GENERATOR": "⚙️ |",
+  "GROUP CHAT": "👥 |",
+  "IMAGE": "🖼️ |",
+  "IMAGE GENERATOR": "🎨 |",
+  "IMAGE GENERATOR 2": "🎨 |",
+  "INFO": "ℹ️ |",
+  "INFORMATION": "📰 |",
+  "ISLAMIC": "🕌 |",
+  "LOVE": "❤️ |",
+  "MEDIA": "🎞️ |",
+  "MUSIC": "🎵 |",
+  "NO PREFIX": "🚫 |",
+  "OWNER": "👑 |",
+  "RANK": "🏆 |",
+  "SONG LYRICS": "🎶 |",
+  "SYSTEM": "⚙️ |",
+  "TEXT": "✍️ |",
+  "TOOLS": "🛠️ |",
+  "UTILITY": "🧰 |",
+  "ECONOMY (BANK)": "🏦 |"
+};
 
 module.exports = {
-	config: {
-		name: "prefix",
-		version: "1.5",
-		author: "🔰 𝐁𝐚𝐘𝐣𝐢𝐝 🔰",
-		countDown: 5,
-		role: 0,
-		description: "🛠️ 𝐂𝐡𝐚𝐧𝐠𝐞 𝐭𝐡𝐞 𝐛𝐨𝐭 𝐩𝐫𝐞𝐟𝐢𝐱 𝐢𝐧 𝐲𝐨𝐮𝐫 𝐜𝐡𝐚𝐭 𝐛𝐨𝐱 𝐨𝐫 𝐭𝐡𝐞 𝐞𝐧𝐭𝐢𝐫𝐞 𝐬𝐲𝐬𝐭𝐞𝐦 (𝐨𝐧𝐥𝐲 𝐛𝐨𝐭 𝐚𝐝𝐦𝐢𝐧)",
-		category: "⚙️ 𝐂𝐨𝐧𝐟𝐢𝐠𝐮𝐫𝐚𝐭𝐢𝐨𝐧",
-		guide: {
-			en: 
-				"━━━━━━━━━━━━━━━━━━━\n"
-				+ "📌 {pn} <new prefix>: 𝐂𝐡𝐚𝐧𝐠𝐞 𝐭𝐡𝐞 𝐩𝐫𝐞𝐟𝐢𝐱 𝐢𝐧 𝐲𝐨𝐮𝐫 𝐜𝐡𝐚𝐭 𝐛𝐨𝐱\n"
-				+ "━━━━━━━━━━━━━━━━━━━\n"
-				+ "📍 𝐄𝐱𝐚𝐦𝐩𝐥𝐞:\n"
-				+ "🔹 {pn} #\n"
-				+ "━━━━━━━━━━━━━━━━━━━\n"
-				+ "📌 {pn} <new prefix> -g: 𝐂𝐡𝐚𝐧𝐠𝐞 𝐭𝐡𝐞 𝐩𝐫𝐞𝐟𝐢𝐱 𝐢𝐧 𝐭𝐡𝐞 𝐞𝐧𝐭𝐢𝐫𝐞 𝐬𝐲𝐬𝐭𝐞𝐦 (𝐨𝐧𝐥𝐲 𝐛𝐨𝐭 𝐚𝐝𝐦𝐢𝐧)\n"
-				+ "━━━━━━━━━━━━━━━━━━━\n"
-				+ "📍 𝐄𝐱𝐚𝐦𝐩𝐥𝐞:\n"
-				+ "🔹 {pn} # -g\n"
-				+ "━━━━━━━━━━━━━━━━━━━\n"
-				+ "🛠️ {pn} reset: 𝐑𝐞𝐬𝐞𝐭 𝐲𝐨𝐮𝐫 𝐜𝐡𝐚𝐭 𝐛𝐨𝐱 𝐩𝐫𝐞𝐟𝐢𝐱 𝐭𝐨 𝐝𝐞𝐟𝐚𝐮𝐥𝐭\n"
-				+ "━━━━━━━━━━━━━━━━━━━"
-		}
-	},
+  config: {
+    name: "help",
+    version: "2.1",
+    author: "Ew’r Saim",
+    countDown: 5,
+    role: 0,
+    shortDescription: { en: "View command usage and list all commands directly" },
+    longDescription: { en: "View command usage and list all commands directly" },
+    category: "info",
+    guide: { en: "{pn} / help [category] or help commandName" },
+    priority: 1,
+  },
 
-	langs: {
-		en: {
-			reset: 
-				"━━━━━━━━━━━━━━━━━━━\n"
-				+ "✅ 𝐘𝐨𝐮𝐫 𝐩𝐫𝐞𝐟𝐢𝐱 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝐫𝐞𝐬𝐞𝐭 𝐭𝐨 𝐝𝐞𝐟𝐚𝐮𝐥𝐭: %1\n"
-				+ "━━━━━━━━━━━━━━━━━━━",
-			onlyAdmin: 
-				"━━━━━━━━━━━━━━━━━━━\n"
-				+ "⚠️ 𝐎𝐧𝐥𝐲 𝐚𝐝𝐦𝐢𝐧 𝐜𝐚𝐧 𝐜𝐡𝐚𝐧𝐠𝐞 𝐭𝐡𝐞 𝐬𝐲𝐬𝐭𝐞𝐦 𝐩𝐫𝐞𝐟𝐢𝐱!\n"
-				+ "━━━━━━━━━━━━━━━━━━━",
-			confirmGlobal: 
-				"━━━━━━━━━━━━━━━━━━━\n"
-				+ "🔄 𝐏𝐥𝐞𝐚𝐬𝐞 𝐫𝐞𝐚𝐜𝐭 𝐭𝐨 𝐭𝐡𝐢𝐬 𝐦𝐞𝐬𝐬𝐚𝐠𝐞 𝐭𝐨 𝐜𝐨𝐧𝐟𝐢𝐫𝐦 𝐜𝐡𝐚𝐧𝐠𝐢𝐧𝐠 𝐭𝐡𝐞 𝐬𝐲𝐬𝐭𝐞𝐦 𝐩𝐫𝐞𝐟𝐢𝐱.\n"
-				+ "━━━━━━━━━━━━━━━━━━━",
-			confirmThisThread: 
-				"━━━━━━━━━━━━━━━━━━━\n"
-				+ "🔄 𝐏𝐥𝐞𝐚𝐬𝐞 𝐫𝐞𝐚𝐜𝐭 𝐭𝐨 𝐭𝐡𝐢𝐬 𝐦𝐞𝐬𝐬𝐚𝐠𝐞 𝐭𝐨 𝐜𝐨𝐧𝐟𝐢𝐫𝐦 𝐜𝐡𝐚𝐧𝐠𝐢𝐧𝐠 𝐭𝐡𝐞 𝐩𝐫𝐞𝐟𝐢𝐱 𝐢𝐧 𝐲𝐨𝐮𝐫 𝐜𝐡𝐚𝐭 𝐠𝐫𝐨𝐮𝐩.\n"
-				+ "━━━━━━━━━━━━━━━━━━━",
-			successGlobal: 
-				"━━━━━━━━━━━━━━━━━━━\n"
-				+ "✅ 𝐒𝐲𝐬𝐭𝐞𝐦 𝐩𝐫𝐞𝐟𝐢𝐱 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝐜𝐡𝐚𝐧𝐠𝐞𝐝 𝐭𝐨: %1\n"
-				+ "━━━━━━━━━━━━━━━━━━━",
-			successThisThread: 
-				"━━━━━━━━━━━━━━━━━━━\n"
-				+ "✅ 𝐂𝐡𝐚𝐭 𝐠𝐫𝐨𝐮𝐩 𝐩𝐫𝐞𝐟𝐢𝐱 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝐜𝐡𝐚𝐧𝐠𝐞𝐝 𝐭𝐨: %1\n"
-				+ "━━━━━━━━━━━━━━━━━━━",
-			myPrefix: 
-				"━━━━━━━━━━━━━━━━━━━\n"
-				+ "🌍 𝐒𝐲𝐬𝐭𝐞𝐦 𝐏𝐫𝐞𝐟𝐢𝐱: %1\n"
-				+ "💬 𝐘𝐨𝐮𝐫 𝐆𝐫𝐨𝐮𝐩 𝐏𝐫𝐞𝐟𝐢𝐱: %2\n"
-				+ "⏰ 𝐒𝐞𝐫𝐯𝐞𝐫 𝐓𝐢𝐦𝐞: %3\n"
-				+ "━━━━━━━━━━━━━━━━━━━\n"
-				+ "💡 𝐓𝐨 𝐮𝐬𝐞 𝐜𝐨𝐦𝐦𝐚𝐧𝐝𝐬, 𝐭𝐲𝐩𝐞 ➜ %2help 𝐭𝐨 𝐬𝐞𝐞 𝐚𝐯𝐚𝐢𝐥𝐚𝐛𝐥𝐞 𝐜𝐨𝐦𝐦𝐚𝐧𝐝𝐬!\n"
-				+ "━━━━━━━━━━━━━━━━━━━"
-		}
-	},
+  onStart: async function({ message, args, event, role }) {
+    const { threadID } = event;
+    const prefix = getPrefix(threadID);
+    const categories = {};
 
-	onStart: async function ({ message, role, args, commandName, event, threadsData, getLang }) {
-		if (!args[0]) return message.SyntaxError();
+    let categoryFont = {}, commandFont = {};
+    try {
+      const [catRes, cmdRes] = await Promise.all([
+        (await fetch(`${fontBaseUrl}/16.json`)).json(),
+        (await fetch(`${fontBaseUrl}/20.json`)).json()
+      ]);
+      categoryFont = catRes;
+      commandFont = cmdRes;
+    } catch (e) {
+      console.error(e);
+    }
 
-		if (args[0] === "reset") {
-			await threadsData.set(event.threadID, null, "data.prefix");
-			return message.reply(getLang("reset", global.GoatBot.config.prefix));
-		}
+    const applyFont = (text, map) => [...text].map(ch => map[ch] || ch).join("");
 
-		const newPrefix = args[0];
-		const formSet = {
-			commandName,
-			author: event.senderID,
-			newPrefix,
-			setGlobal: args[1] === "-g"
-		};
+    for (const [name, cmd] of commands) {
+      if (!cmd?.config || typeof cmd.onStart !== "function") continue;
+      if (cmd.config.role > 1 && role < cmd.config.role) continue;
+      const catName = cmd.config.category?.toUpperCase() || "UNCATEGORIZED";
+      if (!categories[catName]) categories[catName] = [];
+      categories[catName].push(name);
+    }
 
-		if (formSet.setGlobal && role < 2) {
-			return message.reply(getLang("onlyAdmin"));
-		}
+    if (!args.length) {
+      let msg = "━━━━━━━━━━━━━━\n";
+      msg += "𝘈𝘷𝘢𝘪𝘭𝘢𝘣𝘭𝘦 𝘊𝘰𝘮𝘮𝘢𝘯𝘥𝘴:\n";
+      const sortedCats = Object.keys(categories).sort();
+      for (const cat of sortedCats) {
+        const cmdList = categories[cat].sort((a, b) => a.localeCompare(b));
+        const emojiPrefix = categoryEmojis[cat] || "";
+        const styledCat = applyFont(cat, categoryFont);
+        msg += "╭─╼━━━━━━━━╾─╮\n";
+        msg += `│ ${emojiPrefix} ${styledCat}\n`;
+        for (const cmdName of cmdList) {
+          msg += `│ ⤜ ${applyFont(cmdName, commandFont)}\n`;
+        }
+        msg += "╰─━━━━━━━━━╾─╯\n";
+      }
 
-		const confirmMessage = formSet.setGlobal ? getLang("confirmGlobal") : getLang("confirmThisThread");
-		return message.reply(confirmMessage, (err, info) => {
-			formSet.messageID = info.messageID;
-			global.GoatBot.onReaction.set(info.messageID, formSet);
-		});
-	},
+      const totalCommandCount = commands.size;
+      msg += `• 𝙽𝚎𝚎𝚍 𝚑𝚎𝚕𝚙 𝚠𝚒𝚝𝚑 𝚊 𝚌𝚘𝚖𝚖𝚊𝚗𝚍? 𝚄𝚜𝚎 ${prefix}help <commandName> to get full details.\n`;
+      msg += "━━━━━━━━━━━━━━\n";
+      msg += `🔢 Total Commands: ${totalCommandCount}\n`;
+      msg += `⚡️ Prefix: ${prefix}\n`;
+      msg += `👑 Owner: ${applyFont("RaiHan", commandFont)}\n`; // permanently styled RaiHan
+      msg += "━━━━━━━━━━━━━━";
 
-	onReaction: async function ({ message, threadsData, event, Reaction, getLang }) {
-		const { author, newPrefix, setGlobal } = Reaction;
-		if (event.userID !== author) return;
+      return message.reply(msg);
+    }
 
-		if (setGlobal) {
-			global.GoatBot.config.prefix = newPrefix;
-			fs.writeFileSync(global.client.dirConfig, JSON.stringify(global.GoatBot.config, null, 2));
-			return message.reply(getLang("successGlobal", newPrefix));
-		}
+    const input = args[0].toLowerCase();
+    const command = commands.get(input) || commands.get(aliases.get(input));
+    if (!command || !command.config) {
+      return message.reply(`❌ Command or category "${input}" not found.\nUse ${prefix}help to see the full list.`);
+    }
 
-		await threadsData.set(event.threadID, newPrefix, "data.prefix");
-		return message.reply(getLang("successThisThread", newPrefix));
-	},
+    const config = command.config;
+    const usage = (config.guide?.en || "No guide available.").replace(/{pn}/g, prefix + config.name);
+    const roleText = (() => {
+      switch (config.role) {
+        case 0: return "All users";
+        case 1: return "Group Admins";
+        case 2: return "Bot Admins";
+        default: return "Unknown";
+      }
+    })();
 
-	onChat: async function ({ event, message, getLang }) {
-		if (event.body && event.body.toLowerCase() === "prefix") {
-			const serverTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" }); // ঢাকার সময়
-			
-			return message.reply(getLang("myPrefix", global.GoatBot.config.prefix, utils.getPrefix(event.threadID), serverTime));
-		}
-	}
+    let info = "━━━━━━━━━━━━━━\n";
+    info += applyFont("Command Info", categoryFont) + ":\n";
+    info += "╭─╼━━━━━━━━╾─╮\n";
+    info += `│ Name : ${applyFont(config.name, commandFont)}\n`;
+    info += `│ Category : ${config.category || "Uncategorized"}\n`;
+    info += `│ Version : ${config.version || "1.0"}\n`;
+    info += `│ Author : ${applyFont("RaiHan", commandFont)}\n`; // permanently styled RaiHan
+    info += `│ Permission : ${config.role} (${roleText})\n`;
+    info += `│ Cooldown : ${config.countDown || 5}s\n`;
+    info += `│ Description: ${config.longDescription?.en || "No description available."}\n`;
+    info += `│ Usage : ${usage}\n`;
+    info += "╰─━━━━━━━━━╾─╯\n";
+    info += "━━━━━━━━━━━━━━";
+
+    return message.reply(info);
+  },
 };
