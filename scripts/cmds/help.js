@@ -1,167 +1,146 @@
- 
-const axios = require("axios");
 const { getPrefix } = global.utils;
 const { commands, aliases } = global.GoatBot;
+const fontBaseUrl = "https://raw.githubusercontent.com/Saim12678/Saim69/1a8068d7d28396dbecff28f422cb8bc9bf62d85f/font";
 
-const mediaUrls = [
-  "", "", ""
-];
+const categoryEmojis = {
+  "📛": "☣️ |",
+  "ADMIN": "🛡️ |",
+  "AI": "🤖 |",
+  "AI-IMAGE": "🖼️ |",
+  "ANIME": "😺 |",
+  "AUTOMATION": "⚙️ |",
+  "BOX CHAT": "🗃️ |",
+  "CHAT": "💬 |",
+  "CONFIG": "⚙️ |",
+  "CONTACTS ADMIN": "📞 |",
+  "CONVERT": "🔄 |",
+  "CUSTOM": "✨ |",
+  "DONT KNOW": "❓ |",
+  "ECONOMY": "💰 |",
+  "FIGHT": "🥊 |",
+  "FUN": "😜 |",
+  "GAME": "🎮 |",
+  "GENERATOR": "⚙️ |",
+  "GROUP CHAT": "👥 |",
+  "IMAGE": "🖼️ |",
+  "IMAGE GENERATOR": "🎨 |",
+  "IMAGE GENERATOR 2": "🎨 |",
+  "INFO": "ℹ️ |",
+  "INFORMATION": "📰 |",
+  "ISLAMIC": "🕌 |",
+  "LOVE": "❤️ |",
+  "MEDIA": "🎞️ |",
+  "MUSIC": "🎵 |",
+  "NO PREFIX": "🚫 |",
+  "OWNER": "👑 |",
+  "RANK": "🏆 |",
+  "SONG LYRICS": "🎶 |",
+  "SYSTEM": "⚙️ |",
+  "TEXT": "✍️ |",
+  "TOOLS": "🛠️ |",
+  "UTILITY": "🧰 |",
+  "ECONOMY (BANK)": "🏦 |"
+};
 
 module.exports = {
   config: {
     name: "help",
-    aliases: ["use"],
-    version: "1.25",
-    author: "Ayanokōji",
+    version: "2.1",
+    author: "Ew’r Saim",
     countDown: 5,
     role: 0,
-    shortDescription: { en: "Explore command usage 📖" },
-    longDescription: { en: "View detailed command usage, list commands by page, or filter by category ✨" },
+    shortDescription: { en: "View command usage and list all commands directly" },
+    longDescription: { en: "View command usage and list all commands directly" },
     category: "info",
-    guide: {
-      en: "🔹 {pn} [pageNumber]\n🔹 {pn} [commandName]\n🔹 {pn} -c <categoryName>"
-    },
+    guide: { en: "{pn} / help [category] or help commandName" },
     priority: 1,
   },
 
-  onStart: async function ({ message, args, event, threadsData }) {
+  onStart: async function({ message, args, event, role }) {
+    const { threadID } = event;
+    const prefix = getPrefix(threadID);
+    const categories = {};
+
+    let categoryFont = {}, commandFont = {};
     try {
-      const { threadID } = event;
-      const prefix = getPrefix(threadID) || "!";
-
-      const getAttachment = async () => {
-        try {
-          const randomUrl = mediaUrls[Math.floor(Math.random() * mediaUrls.length)];
-          if (!randomUrl) return null;
-          const response = await axios.get(randomUrl, { responseType: "stream" });
-          return response.data;
-        } catch (error) {
-          console.warn("Failed to fetch media:", error.message);
-          return null;
-        }
-      };
-
-      // PAGE VIEW
-      if (args.length === 0 || !isNaN(args[0])) {
-        const categories = {};
-        const commandList = [];
-
-        for (const [name, value] of commands) {
-          const category = value.config.category?.toLowerCase() || "uncategorized";
-          if (!categories[category]) categories[category] = [];
-          categories[category].push(name);
-          commandList.push(name);
-        }
-
-        const totalCommands = commandList.length;
-        Object.keys(categories).forEach(cat => {
-          categories[cat].sort((a, b) => a.localeCompare(b));
-        });
-
-        const sortedCategories = Object.keys(categories).sort();
-        const page = parseInt(args[0]) || 1;
-        const itemsPerPage = 5;
-        const totalPages = Math.ceil(sortedCategories.length / itemsPerPage);
-
-        if (page < 1 || page > totalPages)
-          return message.reply(`🚫 Invalid page! Please choose between 1 and ${totalPages}.`);
-
-        const start = (page - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const pagedCategories = sortedCategories.slice(start, end);
-
-        let msg = `✨ [ Guide For Beginners - Page ${page} ] ✨\n\n`;
-        for (const category of pagedCategories) {
-          const cmds = categories[category];
-          const title = category.toUpperCase();
-          msg += `╭──── [ ${title} ]\n`;
-          msg += `│ ✧ ${cmds.join("✧ ")}\n`;
-          msg += `╰───────────────◊\n`;
-        }
-
-        msg += `\n╭─『 ARIYAN BOT 』\n`;
-        msg += `╰‣ Total commands: ${totalCommands}\n`;
-        msg += `╰‣ Page ${page} of ${totalPages}\n`;
-        msg += `╰‣ A Personal Facebook Bot\n`;
-        msg += `╰‣ ADMIN: Ariyan\n`;
-        msg += `╰‣ To see usage of a command, type: ${prefix}help [commandName]`;
-
-        return message.reply({
-          body: msg,
-          attachment: await getAttachment()
-        });
-      }
-
-      // CATEGORY FILTER -c <category>
-      if (args[0].toLowerCase() === "-c") {
-        if (!args[1]) return message.reply("🚫 Please specify a category!");
-        const categoryName = args[1].toLowerCase();
-        const filteredCommands = Array.from(commands.values()).filter(
-          (cmd) => (cmd.config.category?.toLowerCase() === categoryName)
-        );
-
-        if (filteredCommands.length === 0)
-          return message.reply(`🚫 No commands found in "${categoryName}" category.`);
-
-        const cmdNames = filteredCommands.map(cmd => cmd.config.name).sort((a, b) => a.localeCompare(b));
-        const title = categoryName.toUpperCase();
-
-        let msg = `✨ [ ${title} Commands ] ✨\n\n`;
-        msg += `╭──── [ ${title} ]\n`;
-        msg += `│ ✧ ${cmdNames.join("✧ ")}\n`;
-        msg += `╰───────────────◊\n`;
-        msg += `\n╭─『 ARIYAN BOT 』\n`;
-        msg += `╰‣ Total commands in this category: ${cmdNames.length}\n`;
-        msg += `╰‣ A Personal Facebook Bot\n`;
-        msg += `╰‣ ADMIN: Ariyan`;
-
-        return message.reply({
-          body: msg,
-          attachment: await getAttachment()
-        });
-      }
-
-      // INDIVIDUAL COMMAND
-      const commandName = args[0].toLowerCase();
-      const command = commands.get(commandName) || commands.get(aliases.get(commandName));
-
-      if (!command)
-        return message.reply(`🚫 Command "${commandName}" not found.`);
-
-      const configCommand = command.config;
-      const author = configCommand.author || "Unknown";
-      const longDescription = configCommand.longDescription?.en || "No description";
-      const guideBody = configCommand.guide?.en || "No guide available.";
-      const usage = guideBody.replace(/{pn}/g, prefix).replace(/{n}/g, configCommand.name);
-
-      let msg = `✨ [ Command: ${configCommand.name.toUpperCase()} ] ✨\n\n`;
-      msg += `╭─── 📜 Details ───\n` +
-        `│ 🔹 Name: ${configCommand.name}\n` +
-        `│ 📝 Description: ${longDescription}\n` +
-        `│ 🌐 Aliases: ${configCommand.aliases ? configCommand.aliases.join(", ") : "None"}\n` +
-        `│ 🛠 Version: ${configCommand.version || "1.0"}\n` +
-        `│ ⏳ Cooldown: ${configCommand.countDown || 1}s\n` +
-        `│ ✍ Author: ${author}\n` +
-        `╰───────────────◊\n` +
-        `╭─── 📚 Usage ───\n` +
-        `│ ${usage}\n` +
-        `╰───────────────◊\n` +
-        `╭─── 📌 Notes ───\n` +
-        `│ Customize as needed with ♡ Ariyan bot ♡\n` +
-        `╰───────────────◊\n` +
-        `╭─『 ARIYAN BOT 』\n` +
-        `╰‣ Total commands: ${commands.size}\n` +
-        `╰‣ A Personal Facebook Bot\n` +
-        `╰‣ ADMIN: Ariyan`;
-
-      return message.reply({
-        body: msg,
-        attachment: await getAttachment()
-      });
-
-    } catch (error) {
-      console.error("Help command error:", error);
-      await message.reply("⚠ An error occurred. Please try again later.");
+      const [catRes, cmdRes] = await Promise.all([
+        (await fetch(`${fontBaseUrl}/16.json`)).json(),
+        (await fetch(`${fontBaseUrl}/20.json`)).json()
+      ]);
+      categoryFont = catRes;
+      commandFont = cmdRes;
+    } catch (e) {
+      console.error(e);
     }
+
+    const applyFont = (text, map) => [...text].map(ch => map[ch] || ch).join("");
+
+    for (const [name, cmd] of commands) {
+      if (!cmd?.config || typeof cmd.onStart !== "function") continue;
+      if (cmd.config.role > 1 && role < cmd.config.role) continue;
+      const catName = cmd.config.category?.toUpperCase() || "UNCATEGORIZED";
+      if (!categories[catName]) categories[catName] = [];
+      categories[catName].push(name);
+    }
+
+    if (!args.length) {
+      let msg = "━━━━━━━━━━━━━━\n";
+      msg += "𝘈𝘷𝘢𝘪𝘭𝘢𝘣𝘭𝘦 𝘊𝘰𝘮𝘮𝘢𝘯𝘥𝘴:\n";
+      const sortedCats = Object.keys(categories).sort();
+      for (const cat of sortedCats) {
+        const cmdList = categories[cat].sort((a, b) => a.localeCompare(b));
+        const emojiPrefix = categoryEmojis[cat] || "";
+        const styledCat = applyFont(cat, categoryFont);
+        msg += "╭─╼━━━━━━━━╾─╮\n";
+        msg += `│ ${emojiPrefix} ${styledCat}\n`;
+        for (const cmdName of cmdList) {
+          msg += `│ ⤜ ${applyFont(cmdName, commandFont)}\n`;
+        }
+        msg += "╰─━━━━━━━━━╾─╯\n";
+      }
+
+      const totalCommandCount = commands.size;
+      msg += `• 𝙽𝚎𝚎𝚍 𝚑𝚎𝚕𝚙 𝚠𝚒𝚝𝚑 𝚊 𝚌𝚘𝚖𝚖𝚊𝚗𝚍? 𝚄𝚜𝚎 ${prefix}help <commandName> to get full details.\n`;
+      msg += "━━━━━━━━━━━━━━\n";
+      msg += `🔢 Total Commands: ${totalCommandCount}\n`;
+      msg += `⚡️ Prefix: ${prefix}\n`;
+      msg += `👑 Owner: ${applyFont("RaiHan", commandFont)}\n`; // permanently styled RaiHan
+      msg += "━━━━━━━━━━━━━━";
+
+      return message.reply(msg);
+    }
+
+    const input = args[0].toLowerCase();
+    const command = commands.get(input) || commands.get(aliases.get(input));
+    if (!command || !command.config) {
+      return message.reply(`❌ Command or category "${input}" not found.\nUse ${prefix}help to see the full list.`);
+    }
+
+    const config = command.config;
+    const usage = (config.guide?.en || "No guide available.").replace(/{pn}/g, prefix + config.name);
+    const roleText = (() => {
+      switch (config.role) {
+        case 0: return "All users";
+        case 1: return "Group Admins";
+        case 2: return "Bot Admins";
+        default: return "Unknown";
+      }
+    })();
+
+    let info = "━━━━━━━━━━━━━━\n";
+    info += applyFont("Command Info", categoryFont) + ":\n";
+    info += "╭─╼━━━━━━━━╾─╮\n";
+    info += `│ Name : ${applyFont(config.name, commandFont)}\n`;
+    info += `│ Category : ${config.category || "Uncategorized"}\n`;
+    info += `│ Version : ${config.version || "1.0"}\n`;
+    info += `│ Author : ${applyFont("RaiHan", commandFont)}\n`; // permanently styled RaiHan
+    info += `│ Permission : ${config.role} (${roleText})\n`;
+    info += `│ Cooldown : ${config.countDown || 5}s\n`;
+    info += `│ Description: ${config.longDescription?.en || "No description available."}\n`;
+    info += `│ Usage : ${usage}\n`;
+    info += "╰─━━━━━━━━━╾─╯\n";
+    info += "━━━━━━━━━━━━━━";
+
+    return message.reply(info);
   },
 };
